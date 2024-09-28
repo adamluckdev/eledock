@@ -1,0 +1,146 @@
+#! /bin/sh
+
+find_running_php_fpm_container() {
+  local container=$(docker ps | grep eledock-php${1}-fpm | awk '{print $1}')
+
+  if [ -z "${container}" ]; then
+    echo "Running container for PHP version ${1} was not found"
+    exit 1
+  fi
+
+  echo ${container}
+}
+
+xdebug() {
+  if [ -z ${2+x} ] || [ ${2} == "help" ]; then
+    xdebug_help
+    exit 1
+  fi
+
+  if [ -z ${2+x} ] || [ -z ${3+x} ]; then
+    echo "Missing required argument."
+    echo "---"
+    xdebug_help
+    exit 1
+  fi
+
+  PHP_FPM_CONTAINER=$(find_running_php_fpm_container $3 2>&1)
+
+  if [[ $? -ne 0 ]]; then
+    echo $PHP_FPM_CONTAINER
+    exit 1
+  fi
+
+  case $2 in
+    stop | STOP)
+      xdebug_stop
+      ;;
+    start | START)
+      xdebug_start
+      ;;
+    status | STATUS)
+      xdebug_status
+      ;;
+    *)
+      echo "Unrecognized argument"
+      echo "---"
+      xdebug_help
+      ;;
+  esac
+}
+
+xdebug_status() {
+  echo 'xDebug status'
+  docker exec -it $PHP_FPM_CONTAINER bash -c 'php -m | grep xdebug'
+}
+
+xdebug_start() {
+  echo 'Start xDebug'
+
+  # And uncomment line with xdebug extension, thus enabling it
+  ON_CMD="sed -i 's/^;zend_extension=/zend_extension=/g' \
+                    /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+
+  docker exec -it $PHP_FPM_CONTAINER bash -c "${ON_CMD}"
+  docker restart $PHP_FPM_CONTAINER
+  xdebug_status
+}
+
+xdebug_stop() {
+  echo 'Stop xDebug'
+
+  # Comment out xdebug extension line
+  OFF_CMD="sed -i 's/^zend_extension=/;zend_extension=/g' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+
+  docker exec -it $PHP_FPM_CONTAINER bash -c "${OFF_CMD}"
+  # docker-compose restart php-fpm
+  docker restart $PHP_FPM_CONTAINER
+  xdebug_status
+}
+
+xdebug_help() {
+  echo "xDebug [stop | start | status] in the php container."
+  echo "Usage:"
+  echo " ./eledock xdebug stop|start|status 81|82|83"
+}
+
+php() {
+  if [ -z ${2+x} ] || [ ${2} == "help" ]; then
+    php_help
+    exit 1
+  fi
+
+  if [ -z ${2+x} ] || [ -z ${3+x} ]; then
+    echo "Missing required argument."
+    echo "---"
+    php_help
+    exit 1
+  fi
+
+  PHP_FPM_CONTAINER=$(find_running_php_fpm_container $3 2>&1)
+
+  if [[ $? -ne 0 ]]; then
+    echo $PHP_FPM_CONTAINER
+    exit 1
+  fi
+
+  case $2 in
+    enter | ENTER)
+      php_enter
+      ;;
+    *)
+      echo "Unrecognized argument"
+      echo "---"
+      php_help
+      ;;
+  esac
+}
+
+php_enter() {
+  docker exec -u www-data -it $PHP_FPM_CONTAINER bash
+}
+
+php_help() {
+  echo "php [enter] in the php container"
+  echo "Usage:"
+  echo " ./eledock php enter 81|82|83"
+}
+
+help() {
+  echo "Supported commands:"
+  echo "xdebug"
+}
+
+case $1 in
+  xdebug)
+    xdebug $@
+    ;;
+  php)
+    php $@
+    ;;
+  *)
+    help
+    ;;
+esac
+
+exit 0
