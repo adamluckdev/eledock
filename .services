@@ -1,1 +1,0 @@
-export REQUIRED_SERVICES="nginx php81-fpm php82-fpm php83-fpm"
