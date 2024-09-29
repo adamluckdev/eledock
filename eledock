@@ -73,7 +73,6 @@ xdebug_stop() {
   OFF_CMD="sed -i 's/^zend_extension=/;zend_extension=/g' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
 
   docker exec -it $PHP_FPM_CONTAINER bash -c "${OFF_CMD}"
-  # docker-compose restart php-fpm
   docker restart $PHP_FPM_CONTAINER
   xdebug_status
 }
@@ -84,16 +83,11 @@ xdebug_help() {
   echo " ./eledock xdebug stop|start|status 81|82|83"
 }
 
-php() {
-  if [ -z ${2+x} ] || [ ${2} == "help" ]; then
-    php_help
-    exit 1
-  fi
-
-  if [ -z ${2+x} ] || [ -z ${3+x} ]; then
-    echo "Missing required argument."
+php_enter() {
+  if [ -z ${3+x} ]; then
+    echo "Missing PHP version."
     echo "---"
-    php_help
+    php_enter_help
     exit 1
   fi
 
@@ -104,39 +98,64 @@ php() {
     exit 1
   fi
 
+  docker exec -u www-data -it $PHP_FPM_CONTAINER bash
+}
+
+php_enter_help() {
+  echo "Usage:"
+  echo " ./eledock enter php 81|82|83"
+}
+
+help() {
+  echo "Usage:"
+  echo "./eledock enter|xdebug|start|stop"
+}
+
+enter() {
   case $2 in
-    enter | ENTER)
-      php_enter
+    php | PHP)
+      php_enter $@
+      ;;
+    nodejs | NODEJS)
+      docker exec -u node -it eledock-nodejs bash
       ;;
     *)
       echo "Unrecognized argument"
       echo "---"
-      php_help
+      enter_help
       ;;
   esac
 }
 
-php_enter() {
-  docker exec -u www-data -it $PHP_FPM_CONTAINER bash
-}
-
-php_help() {
-  echo "php [enter] in the php container"
+enter_help() {
   echo "Usage:"
-  echo " ./eledock php enter 81|82|83"
+  echo "./eledock enter nodejs|php"
 }
 
-help() {
-  echo "Supported commands:"
-  echo "xdebug"
+start() {
+  local servicesFile="${PWD}/.services"
+  if [ -a $servicesFile ]; then
+    source $servicesFile
+  fi
+  docker compose up -d ${REQUIRED_SERVICES:-} $2
+}
+
+stop() {
+  docker compose stop
 }
 
 case $1 in
   xdebug)
     xdebug $@
     ;;
-  php)
-    php $@
+  enter)
+    enter $@
+    ;;
+  start)
+    start $@
+    ;;
+  stop)
+    stop
     ;;
   *)
     help
