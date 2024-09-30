@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 find_running_php_fpm_container() {
   local container=$(docker ps | grep eledock-php${1}-fpm | awk '{print $1}')
