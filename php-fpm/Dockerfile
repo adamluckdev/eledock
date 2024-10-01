@@ -11,9 +11,8 @@ RUN chmod uga+x /usr/local/bin/install-php-extensions && \
     sync && \
     install-php-extensions bcmath gd exif zip imap intl opcache pdo_mysql pdo_pgsql redis xdebug soap ${ADDITIONAL_PHP_EXTENSIONS} && \
     #Disable Xdebug by default
-    sed -i 's/^zend_extension=/;zend_extension=/g' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
-RUN apt-get update && \
+    sed -i 's/^zend_extension=/;zend_extension=/g' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    apt-get update && \
     apt-get -y install git --no-install-recommends
 
 WORKDIR /var/www
