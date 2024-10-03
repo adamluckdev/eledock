@@ -18,6 +18,8 @@ services:
       - "9000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - internal
 
   php82-fpm:
     container_name: eledock-php82-fpm
@@ -38,6 +40,8 @@ services:
       - "9000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - internal
 
   php83-fpm:
     container_name: eledock-php83-fpm
@@ -58,6 +62,8 @@ services:
       - "9000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - internal
 
   nginx:
     container_name: eledock-nginx
@@ -76,6 +82,9 @@ services:
       - "php81-fpm"
       - "php82-fpm"
       - "php83-fpm"
+    networks:
+      internal:
+        ipv4_address: 10.20.30.11
 
   nodejs:
     container_name: eledock-nodejs
@@ -85,8 +94,11 @@ services:
         - NON_ROOT_UID=${NON_ROOT_UID}
         - NON_ROOT_GID=${NON_ROOT_GID}
     init: true
+    dns: 10.20.30.10
     volumes:
       - ${APP_CODE_PATH_HOST}:/home/node/www
+    networks:
+      - internal
 
   mariadb:
     container_name: eledock-mariadb
@@ -104,6 +116,8 @@ services:
       - MYSQL_USER=${MARIADB_USER}
       - MYSQL_PASSWORD=${MARIADB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    networks:
+      - internal
 
   postgres:
     container_name: eledock-postgres
@@ -120,6 +134,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=${POSTGRES_TIME_ZONE}
+    networks:
+      - internal
 
   adminer:
     container_name: eledock-adminer
@@ -129,6 +145,8 @@ services:
       - ./adminer/uploads.ini:/etc/php/7.4/fpm/conf.d/0-uploads.ini
     ports:
       - "${ADMINER_HOST_HTTP_PORT}:8080"
+    networks:
+      - internal
 
   redis:
     container_name: eledock-redis
@@ -138,6 +156,8 @@ services:
       - ${DATA_PATH_HOST}/redis:/data
     ports:
       - "${REDIS_PORT}:6379"
+    networks:
+      - internal
 
   redis-webui:
     container_name: eledock-redis-webui
@@ -152,6 +172,8 @@ services:
       - "${REDIS_WEBUI_PORT}:80"
     depends_on:
       - redis
+    networks:
+      - internal
 
   mailhog:
     container_name: eledock-mailhog
@@ -162,6 +184,8 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+    networks:
+      - internal
 
   sftp:
     container_name: eledock-sftp
@@ -176,3 +200,24 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    networks:
+      - internal
+
+  dnsmasq:
+    container_name: eledock-dnsmasq
+    build:
+      context: ./dnsmasq
+    volumes:
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+    cap_add:
+      - NET_ADMIN
+    networks:
+      internal:
+        ipv4_address: 10.20.30.10
+
+networks:
+  internal:
+    external: false
+    ipam:
+      config:
+        - subnet: 10.20.30.0/24

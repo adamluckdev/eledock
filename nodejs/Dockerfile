@@ -9,7 +9,8 @@ RUN \
   if [ ! $(getent group $NON_ROOT_GID) ] ; then groupadd --gid ${NON_ROOT_GID} node ; fi && \
   useradd --uid ${NON_ROOT_UID} --gid ${NON_ROOT_GID} --shell /bin/bash --create-home node && \
   apt-get update && \
-  apt-get install -y ca-certificates curl wget gnupg dirmngr xz-utils libatomic1 unzip --no-install-recommends
+  # Cypress dependencies included
+  apt-get install -y ca-certificates curl wget gnupg dirmngr xz-utils libatomic1 unzip libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb --no-install-recommends
 
 USER node
 
