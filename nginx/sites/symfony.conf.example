@@ -9,7 +9,7 @@ server {
     # ssl_certificate /etc/nginx/ssl/default.crt;
     # ssl_certificate_key /etc/nginx/ssl/default.key;
 
-    server_name symfony.test;
+    server_name symfony.localhost;
     root /var/www/projects/symfony/public;
     index index.php index.html index.htm;
 

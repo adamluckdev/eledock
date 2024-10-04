@@ -10,10 +10,10 @@ services:
         - ADDITIONAL_PHP_EXTENSIONS=${PHP_81_ADDITIONAL_EXTENSIONS}
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-      - ./php-fpm/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
+      - ./php-fpm/eledock.ini:/usr/local/etc/php/conf.d/eledock.ini
       - ./php-fpm/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
       - ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-      - ./php-fpm/xlaravel.pool.conf:/usr/local/etc/php-fpm.d/xlaravel.pool.conf
+      - ./php-fpm/eledock.pool.conf:/usr/local/etc/php-fpm.d/eledock.pool.conf
     expose:
       - "9000"
     extra_hosts:
@@ -32,10 +32,10 @@ services:
         - ADDITIONAL_PHP_EXTENSIONS=${PHP_82_ADDITIONAL_EXTENSIONS}
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-      - ./php-fpm/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
+      - ./php-fpm/eledock.ini:/usr/local/etc/php/conf.d/eledock.ini
       - ./php-fpm/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
       - ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-      - ./php-fpm/xlaravel.pool.conf:/usr/local/etc/php-fpm.d/xlaravel.pool.conf
+      - ./php-fpm/eledock.pool.conf:/usr/local/etc/php-fpm.d/eledock.pool.conf
     expose:
       - "9000"
     extra_hosts:
@@ -54,10 +54,10 @@ services:
         - ADDITIONAL_PHP_EXTENSIONS=${PHP_83_ADDITIONAL_EXTENSIONS}
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
-      - ./php-fpm/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
+      - ./php-fpm/eledock.ini:/usr/local/etc/php/conf.d/eledock.ini
       - ./php-fpm/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
       - ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-      - ./php-fpm/xlaravel.pool.conf:/usr/local/etc/php-fpm.d/xlaravel.pool.conf
+      - ./php-fpm/eledock.pool.conf:/usr/local/etc/php-fpm.d/eledock.pool.conf
     expose:
       - "9000"
     extra_hosts:
@@ -82,6 +82,7 @@ services:
       - "php81-fpm"
       - "php82-fpm"
       - "php83-fpm"
+      - "dnsmasq"
     networks:
       internal:
         ipv4_address: 10.20.30.11

@@ -1,5 +1,5 @@
 server {
-    server_name drupal.test;
+    server_name drupal.localhost;
     root /var/www/drupal/web;
 
     location = /favicon.ico {
