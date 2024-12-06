@@ -55,3 +55,15 @@ Node.js use [FNM](https://github.com/Schniz/fnm) to manage multiple versions so 
 ```
 ./eledock eneter nodejs
 ```
+
+## Troubleshooting
+
+### Cypress won't open
+
+Node.js container is trying to invoke X11 server. To enable it on Linux run command suggested from this [Github issue](https://github.com/bahmutov/cypress-open-from-docker-compose/issues/6):
+
+```
+xhost +local:
+```
+
+MacOS users should follow [guide from Cypress blog](https://www.cypress.io/blog/run-cypress-with-a-single-docker-command).

@@ -94,10 +94,13 @@ services:
       args:
         - NON_ROOT_UID=${NON_ROOT_UID}
         - NON_ROOT_GID=${NON_ROOT_GID}
+    environment:
+      - DISPLAY
     init: true
     dns: 10.20.30.10
     volumes:
       - ${APP_CODE_PATH_HOST}:/home/node/www
+      - /tmp/.X11-unix:/tmp/.X11-unix
     networks:
       - internal
 
