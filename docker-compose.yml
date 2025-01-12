@@ -65,6 +65,28 @@ services:
     networks:
       - internal
 
+  php84-fpm:
+    container_name: eledock-php84-fpm
+    build:
+      context: ./php-fpm
+      args:
+        - ELEDOCK_PHP_VERSION=8.4
+        - NON_ROOT_UID=${NON_ROOT_UID}
+        - NON_ROOT_GID=${NON_ROOT_GID}
+        - ADDITIONAL_PHP_EXTENSIONS=${PHP_83_ADDITIONAL_EXTENSIONS}
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ./php-fpm/eledock.ini:/usr/local/etc/php/conf.d/eledock.ini
+      - ./php-fpm/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
+      - ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./php-fpm/eledock.pool.conf:/usr/local/etc/php-fpm.d/eledock.pool.conf
+    expose:
+      - "9000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - internal
+
   nginx:
     container_name: eledock-nginx
     build:
@@ -82,6 +104,7 @@ services:
       - "php81-fpm"
       - "php82-fpm"
       - "php83-fpm"
+      - "php84-fpm"
       - "dnsmasq"
     networks:
       internal:
